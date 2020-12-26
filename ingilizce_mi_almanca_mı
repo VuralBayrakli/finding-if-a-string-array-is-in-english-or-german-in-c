@@ -1,0 +1,127 @@
+#include  <stdio.h>
+#include  <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <math.h>
+#define N 10000 // Girilecek metnin maksimum eleman sayısıdır.
+
+void detect_lang(float x[],int y); // Frekanslar üzerindeki işlemlerinden ardından 
+//calculate_distances fonksiyonundan aldığı değerlere göre dilin hangi dil olduğunu ekrana yazar.
+void calculatedetect_lang_distances(float *arr,int y);// Girilen metnin frekansları hesaplandıktan sonra bu fonksiyon tarafından çağrılır.  
+// Frekanslar arasında işlemler yapar.                                         
+void calculate_frequencies_bi(char x[],int y,float *arr);//Girilen metinde matrix_bigram_strings dizisindeki elemanların frekansını hesaplar.
+void calculate_frequencies_tri(char x[],int y,float *arr);//Girilen metinde matrix_trigram_strings dizisindeki elemanların frekansını hesaplar.
+void filter_str(char *x,int y);//Ana fonksiyondan metni çağırarak harfler ve boşluk haricindeki karakterleri filtreler.                   
+
+void detect_lang(float x[],int y){//calculate_distances fonksiyonundan distances dizisini çağırır.İlk indis ingilizcenin ikinci indis almancanın
+// frekansını tutar.
+if(x[0]<x[1])
+printf("Ingilizce\n");
+else
+printf("Almanca");}
+  }
+  
+  void calculate_distances(float *arr,int y){
+  float a=0.0;
+  float b=0.0;
+  float distances[2]={0.0,0.0};
+  const float frequency_eng[20]={ 2.71, 2.33, 2.03, 1.78, 1.61, 1.13, 0.01, 0.01, 0.01, 0.01, 1.81, 0.73, 0.72, 0.42, 0.42, 0.01, 0.01, 0.01, 0.01, 0.01 };
+  const float frequency_germ[20]={ 0.01, 0.89, 1.71, 3.90, 1.07, 3.61, 2.36, 2.31, 1.98, 1.98, 0.01, 0.01, 0.01, 0.01, 0.01, 1.04, 0.76, 0.75, 0.72, 0.62 };
+  int i;
+  for(int i=0;i<y;i++){
+  a+=pow(frequency_eng[i]-*(arr+i),2);}//Girilen metnin bigramlari ve trigramlari
+  // hesaplanıp frequencies dizisine atandıktan sonra frequencies dizisi elemanları ile  frequency_eng dizisi
+  //elemanları arasındaki oklid uzaklığı sırasıyla elemanlar arasındaki farklar alınıp sonrasında kareleri alınıp 
+  //toplanarak a degiskenine atanir.
+  distances[0]=sqrt(a);//Sırasıyla elemanlar arasındaki farklar alınıp sonrasında kareleri alınıp 
+  //toplandiginda geriye tek kalan toplamın kökünü alıp distances dizisinin 0.indisine atamak.
+  
+  for(int i=0;i<y;i++){
+  b+=pow(frequency_germ[i]-*(arr+i),2);}//Girilen metnin bigramlari ve trigramlari
+  // hesaplanıp frequencies dizisine atandıktan sonra frequencies dizisi elemanları ile  frequency_eng dizisi 
+  //elemanları arasındaki oklid uzaklığı sırasıyla elemanlar arasındaki farklar alınıp sonrasında kareleri alınıp 
+  //toplanarak a değişkenine atanır.
+
+  distances[1]=sqrt(b);//Sırasıyla elemanlar arasındaki farklar alınıp sonrasında kareleri alınıp 
+  //toplandığında geriye tek kalan toplamın kökünü alıp distances dizisinin 1.indisine atamak.
+  
+  detect_lang(distances,2);
+  }
+  
+  void calculate_frequencies_bi(char x[],int y,float *arr){
+  int sayac=0;//Döngü yardımıyla matrix_bigram_strings dizisindeki her bir elemanin toplam sayısını tutacak olan değişken.
+  // Normal olarak her döngü başladığında sayac değeri sıfırlanır.
+  const char matrix_bigram_strings[10][3] ={"th", "he", "in", "er", "an", "en", "ch", "de", "ei", "te"};
+  for(int i=0;i<10;i++){
+  int sayac=0;
+  for(int k=0;k<y-1;k++){//Bu döngüde girilen metindeki elemanların artarda gelen ikili kombinasyonu  
+  //matrix_bigram_strings dizisinin elemanları karşılaştırılır.
+  if (x[k]==matrix_bigram_strings[i][0] && x[k+1]==matrix_bigram_strings[i][1])
+  sayac++;}////Her karşılaştırma sonucu doğru ise  sayac değişkeni iç döngü boyunca bir artırılır.                 
+  *(arr+i)=sayac*100/(strlen(x)-1);// Örnek olarak matrix_bigram_strings dizisindeki 
+  //toplam ‘th’ sayısı bulunduktan sonra frequencies dizisinin adresini tutan *arr 'nin ilgili indisine atanır.
+
+  }
+  
+  }
+
+  void calculate_frequencies_tri(char x[],int y,float *arr){
+  int sayac=0;//Döngü yardımıyla matrix_trigram_strings dizisindeki her bir elemanin toplam sayısını tutacak olan değişken.
+  // Normal olarak her döngü başladığında   sayac değeri sıfırlanır.
+  char matrix_trigram_strings[10][4]={"the", "and", "ing", "ent", "ion", "der", "sch", "ich", "nde", "die"};
+  for(int i=0;i<10;i++){
+  int sayac=0;
+  for(int k=0;k<y-1;k++){//Bu döngüde girilen metindeki elemanların artarda gelen üçlü kombinasyonu  
+  //matrix_bigram_strings dizisinin elemanları karşılaştırılır.
+     if (x[k]==matrix_trigram_strings[i][0] && x[k+1]==matrix_trigram_strings[i][1] && x[k+2]==matrix_trigram_strings[i][2])        
+     sayac++;//Her karşılaştırma sonucu doğru ise  sayac değişkeni iç döngü boyunca bir artırılır.                 
+
+     }               
+     
+       *(arr+i+10)=sayac*100/(strlen(x)-1);// Örnek olarak matrix_trigram_strings dizisindeki 
+  // toplam ‘the’ sayısı bulunduktan sonra frequencies dizisinin adresini tutan *arr 'nin ilgili indisine atanır.
+
+}
+ 
+
+}
+    
+  
+
+   int main(){
+ const  char metin[N];//Girilecek metnin elemanlarını tutacak dizi.
+ float frequencies[20];//Metindeki matrix_trigram_strings ve   matrix_bigram_strings       
+ // dizisindeki elemanların frekans degerini atayacağımız dizi.
+ float *ptr=&frequencies;//frequencies dizisinin adresini tutacak pointer.
+ char *ptr2=&metin;//metin dizisinin adresini tutacak pointer.
+ printf("Metni giriniz: \n");
+ gets(metin);
+ filter_str(ptr,N);//Metin boşluk ve harfler dışındaki diğer karakterlerin filtrelenmesi
+ //icin fonksiyona gonderilir.
+ calculate_frequencies_bi(ptr2,N,ptr);//metin dizisindeki elemanların artarda gelen ikili kombinasyonları ile
+ //matrix_bigram_strings dizisindeki elemanların karşılaştırılması ve oluşacak değerlerin frequencies 
+ // dizisine atanması  için fonsiyon çağrılır.
+ calculate_frequencies_tri(ptr2,N,ptr);//metin dizisindeki elemanların artarda gelen üçlü kombinasyonları ile
+ //matrix_trigram_strings dizisindeki elemanların karşılaştırılması ve oluşacak değerlerin frequencies 
+ // dizisine atanması  için fonsiyon çağrılır.
+ calculate_distances(ptr,20);//Frekanslar hesaplandıktan sonra bu fonksiyon tarafından çağrılma işlemi gerçekleştirilir.
+  return 0;
+ }  
+ void filter_str(char *x,int y){
+ int sayac2=0;// metin dizisinin adresini tutan pointere tek tek karakterleri aktarırken bu değişken birer birer artar.
+ int sayac=0;
+ for(int i=0;i<y;i++){//Harfler ve boşluk dışındaki karakterlerin sayısı hesaplanır.Bu değer hesaplanmaz ise döngü sonunda
+ //dizi elemanları harfler ve bosluk karakterlerinden oluşacaktır fakat sayac sayısı kadar ilgisiz karakterler diziye dahil olacaktır.
+   if(!(x[i]>=65 && x[i]<=99 || x[i]>=97 && x[i]<=122 || x[i]==32)){     
+   sayac++;}
+}
+ for(int i=0;i<y-sayac;i++){//Filtrelenecek karakterlerin sayısı bulunduktan sonra metnin olması gereken
+ //eleman sayısını bulunmuş oldu. Döngü metnin ilk baştaki eleman sayısı ile filtrelenen karakterlerin eleman
+ // sayısının farkı kadar işlemini sürdürecek.
+ if((x[i]>=65 && x[i]<=99 || x[i]>=97 && x[i]<=122 || x[i]==32)){//Karşılaştırma işlemi her doğru çıktığında 
+ //metin dizisinin adresini tutan x pointerine elemanlar ilgili indislere  atanır.
+ *(x+sayac2++)=x[i];}
+   } 
+}
+  
